@@ -23,26 +23,26 @@ function cn(...inputs) {
 }
 
 const MENU = [
-  { id: 1, name: "Carne", price: 9, category: "Espetos" },
-  { id: 2, name: "Carne c/ Bacon", price: 10, category: "Espetos" },
-  { id: 3, name: "Kafta", price: 8, category: "Espetos" },
-  { id: 4, name: "Kafta c/ Queijo", price: 10, category: "Espetos" },
-  { id: 5, name: "Frango c/ Bacon", price: 9, category: "Espetos" },
-  { id: 6, name: "Coração", price: 10, category: "Espetos" },
-  { id: 7, name: "Linguiça", price: 8, category: "Espetos" },
-  { id: 8, name: "Linguiça Apimentada", price: 8, category: "Espetos" },
-  { id: 9, name: "Queijo Coalho", price: 9, category: "Espetos" },
-  { id: 10, name: "Pão de Alho", price: 6, category: "Espetos" },
-  { id: 50, name: "Opcional: No Lanche", price: 6, category: "Adicionais" },
-  { id: 100, name: "Refri Lata", price: 6, category: "Bebidas" },
-  { id: 101, name: "Suco Del Valle", price: 8, category: "Bebidas" },
-  { id: 102, name: "Heineken/Original", price: 6, category: "Bebidas" },
-  { id: 103, name: "Amstel", price: 5, category: "Bebidas" },
-  { id: 104, name: "Skol", price: 4, category: "Bebidas" },
-  { id: 105, name: "Gin (700ml)", price: 15, category: "Bebidas" },
-  { id: 106, name: "Whisky (700ml)", price: 20, category: "Bebidas" },
-  { id: 107, name: "Mansão Maromba", price: 25, category: "Bebidas" },
-  { id: 108, name: "Heineken - LN", price: 10, category: "Bebidas" }
+  { id: 1, name: "Carne", price: 9, cost: 0, category: "Espetos" },
+  { id: 2, name: "Carne c/ Bacon", price: 10, cost: 0, category: "Espetos" },
+  { id: 3, name: "Kafta", price: 8, cost: 0, category: "Espetos" },
+  { id: 4, name: "Kafta c/ Queijo", price: 10, cost: 0, category: "Espetos" },
+  { id: 5, name: "Frango c/ Bacon", price: 9, cost: 0, category: "Espetos" },
+  { id: 6, name: "Coração", price: 10, cost: 0, category: "Espetos" },
+  { id: 7, name: "Linguiça", price: 8, cost: 0, category: "Espetos" },
+  { id: 8, name: "Linguiça Apimentada", price: 8, cost: 0, category: "Espetos" },
+  { id: 9, name: "Queijo Coalho", price: 9, cost: 0, category: "Espetos" },
+  { id: 10, name: "Pão de Alho", price: 6, cost: 0, category: "Espetos" },
+  { id: 50, name: "Opcional: No Lanche", price: 6, cost: 0, category: "Adicionais" },
+  { id: 100, name: "Refri Lata", price: 6, cost: 0, category: "Bebidas" },
+  { id: 101, name: "Suco Del Valle", price: 8, cost: 0, category: "Bebidas" },
+  { id: 102, name: "Heineken/Original", price: 6, cost: 0, category: "Bebidas" },
+  { id: 103, name: "Amstel", price: 5, cost: 0, category: "Bebidas" },
+  { id: 104, name: "Skol", price: 4, cost: 0, category: "Bebidas" },
+  { id: 105, name: "Gin (700ml)", price: 15, cost: 0, category: "Bebidas" },
+  { id: 106, name: "Whisky (700ml)", price: 20, cost: 0, category: "Bebidas" },
+  { id: 107, name: "Mansão Maromba", price: 25, cost: 0, category: "Bebidas" },
+  { id: 108, name: "Heineken - LN", price: 10, cost: 0, category: "Bebidas" }
 ];
 
 export default function App() {
@@ -151,10 +151,12 @@ export default function App() {
       acc[sale.method] = (acc[sale.method] || 0) + sale.total;
       acc.total += sale.total;
       Object.entries(sale.items).forEach(([id, qty]) => {
+        const item = MENU.find(i => i.id == id);
         acc.itemCounts[id] = (acc.itemCounts[id] || 0) + (qty);
+        acc.totalCost += (item?.cost || 0) * (qty);
       });
       return acc;
-    }, { PIX: 0, Cartão: 0, Dinheiro: 0, total: 0, itemCounts: {} });
+    }, { PIX: 0, Cartão: 0, Dinheiro: 0, total: 0, totalCost: 0, itemCounts: {} });
   }, [salesHistory]);
 
   const exportReport = async () => {
@@ -165,7 +167,7 @@ export default function App() {
       .map(([id, qty]) => `• ${qty}x ${MENU.find(i => i.id == id).name}`)
       .join('\n');
 
-    const texto = `🔥 *FECHAMENTO POINT DO HUGÃO*\n📅 ${new Date().toLocaleDateString()}\n\n💰 *Total: R$ ${reportSummary.total.toFixed(2)}*\n------------------\n💎 PIX: R$ ${reportSummary.PIX.toFixed(2)}\n💳 Cartão: R$ ${reportSummary.Cartão.toFixed(2)}\n💵 Dinheiro: R$ ${reportSummary.Dinheiro.toFixed(2)}\n\n📊 *ITENS VENDIDOS:*\n${itemText}\n------------------\n✅ Total de Vendas: ${salesHistory.length}`;
+    const texto = `🔥 *FECHAMENTO POINT DO HUGÃO*\n📅 ${new Date().toLocaleDateString()}\n\n💰 *Total: R$ ${reportSummary.total.toFixed(2)}*\n------------------\n💎 PIX: R$ ${reportSummary.PIX.toFixed(2)}\n💳 Cartão: R$ ${reportSummary.Cartão.toFixed(2)}\n💵 Dinheiro: R$ ${reportSummary.Dinheiro.toFixed(2)}\n\n📊 *ITENS VENDIDOS:*\n${itemText}\n------------------\n💡 Lucro não calculado. Envie seus custos para a Ottomatic para ativar esta função.\n------------------\n✅ Total de Vendas: ${salesHistory.length}`;
 
     try {
       if (navigator.share) {
@@ -410,10 +412,17 @@ export default function App() {
                 </div>
               </div>
 
-              <button
-                onClick={() => setShowCloseConfirmModal(true)}
-                className="w-full py-5 bg-emerald-600 rounded-3xl font-bold text-white shadow-xl shadow-emerald-900/20 active:scale-95 transition-all flex items-center justify-center gap-2"
-              >
+                <div className="p-5 rounded-3xl bg-slate-900 border border-orange-500/20 text-center">
+                  <p className="text-[10px] font-bold text-orange-500 uppercase tracking-widest mb-2">Lucro do Dia</p>
+                  <p className="text-xs text-slate-400 italic leading-relaxed">
+                    Lucro não calculado. Envie seus custos para a Ottomatic para ativar esta função.
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => setShowCloseConfirmModal(true)}
+                  className="w-full py-5 bg-emerald-600 rounded-3xl font-bold text-white shadow-xl shadow-emerald-900/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+                >
                 <CheckCircle2 size={20} />
                 FECHAMENTO E EXPORTAÇÃO
               </button>
