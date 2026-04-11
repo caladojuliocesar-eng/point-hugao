@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Espetinho PDV - Ottomatic</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#020617">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Espetinho VIP">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #020617; color: #f8fafc; user-select: none; -webkit-tap-highlight-color: transparent; font-family: sans-serif; }
+        .active-tab { border-bottom: 4px solid #f97316; color: #f97316; }
+        input, button { font-size: 16px !important; }
+        .hidden { display: none; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden">
+
+    <header class="bg-slate-900 border-b border-slate-800 px-4 py-3 shadow-lg">
+        <div class="flex justify-between items-center max-w-2xl mx-auto">
+            <h1 class="text-orange-500 font-black text-xl tracking-tighter">ESPETINHO<span class="text-white">VIP</span></h1>
+            <div class="bg-green-500/10 text-green-500 px-3 py-1 rounded-full text-[10px] font-bold uppercase border border-green-500/20">Modo Offline Ativo</div>
+        </div>
+    </header>
+
+    <nav class="flex bg-slate-900 border-b border-slate-800 text-sm font-bold uppercase tracking-widest max-w-2xl mx-auto w-full">
+        <button onclick="switchView('orders')" id="tab-orders" class="flex-1 py-4 active-tab transition-all">Comandas</button>
+        <button onclick="switchView('report')" id="tab-report" class="flex-1 py-4 transition-all text-slate-400">Relatório</button>
+    </nav>
+
+    <main class="flex-1 overflow-y-auto p-4 pb-32 max-w-2xl mx-auto w-full">
+        
+        <!-- VIEW: COMANDAS ATIVAS -->
+        <section id="view-orders" class="space-y-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-lg font-bold text-slate-400 uppercase text-xs tracking-widest">Atendimento</h2>
+                <button onclick="openModal('modal-new-order')" class="bg-orange-500 text-white px-6 py-2 rounded-xl font-bold shadow-lg active:scale-95 transition-transform">+ NOVA</button>
+            </div>
+            <div id="orders-list" class="grid gap-3"></div>
+        </section>
+
+        <!-- VIEW: LANÇAMENTO (MENU) -->
+        <section id="view-menu" class="hidden space-y-4">
+            <div class="flex items-center gap-4 mb-4">
+                <button onclick="switchView('orders')" class="text-slate-400 p-2 border border-slate-700 rounded-lg">←</button>
+                <h2 id="menu-customer-name" class="text-xl font-black text-orange-400 uppercase truncate">Cliente</h2>
+            </div>
+            <div id="menu-categories" class="space-y-6"></div>
+        </section>
+
+        <!-- VIEW: RELATÓRIO E FECHAMENTO -->
+        <section id="view-report" class="hidden space-y-6">
+            <h2 class="text-xl font-bold border-b border-slate-800 pb-2">Resumo do Dia</h2>
+            
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+                    <p class="text-slate-500 text-[10px] font-bold uppercase">Total Bruto</p>
+                    <p id="rep-total" class="text-2xl font-black text-white">R$ 0,00</p>
+                </div>
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 text-right">
+                    <p class="text-slate-500 text-[10px] font-bold uppercase">Vendas</p>
+                    <p id="rep-count" class="text-2xl font-black text-white">0</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 rounded-xl border border-slate-800 divide-y divide-slate-800 text-sm">
+                <div class="p-4 flex justify-between"><span>PIX</span><span id="rep-pix" class="font-bold text-cyan-400">R$ 0,00</span></div>
+                <div class="p-4 flex justify-between"><span>CARTÃO</span><span id="rep-card" class="font-bold text-purple-400">R$ 0,00</span></div>
+                <div class="p-4 flex justify-between"><span>DINHEIRO</span><span id="rep-cash" class="font-bold text-emerald-400">R$ 0,00</span></div>
+            </div>
+
+            <div class="space-y-2">
+                <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Itens Vendidos</h3>
+                <div id="rep-items-list" class="bg-slate-900 rounded-xl border border-slate-800 divide-y divide-slate-800 text-sm">
+                    <!-- Itens vendidos aparecem aqui -->
+                </div>
+            </div>
+
+            <button onclick="openModal('modal-confirm-close')" class="w-full py-5 bg-green-600 hover:bg-green-500 text-white rounded-2xl font-black text-lg shadow-xl active:scale-95 transition-all">
+                FECHAR DIA E ENVIAR
+            </button>
+        </section>
+    </main>
+
+    <!-- FOOTER: TOTAL NA TELA DE MENU -->
+    <div id="bottom-bar" class="hidden fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 p-4 shadow-2xl z-40">
+        <div class="max-w-2xl mx-auto flex justify-between items-center">
+            <div>
+                <p class="text-slate-500 text-[10px] font-bold uppercase">Total Comanda</p>
+                <p id="order-total-display" class="text-2xl font-black text-white">R$ 0,00</p>
+            </div>
+            <button onclick="openModal('modal-checkout')" class="bg-green-600 text-white px-8 py-3 rounded-xl font-bold active:scale-95">FECHAR</button>
+        </div>
+    </div>
+
+    <!-- MODAIS -->
+    <div id="modal-new-order" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+        <div class="bg-slate-900 w-full max-w-sm rounded-2xl border border-slate-800 p-6 shadow-2xl">
+            <h3 class="text-xl font-bold mb-4">Novo Cliente</h3>
+            <input type="text" id="input-customer-name" placeholder="Ex: JULIO" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-4 text-white uppercase mb-4 focus:border-orange-500 outline-none">
+            <div class="flex gap-2">
+                <button onclick="closeModals()" class="flex-1 py-3 text-slate-400 font-bold">Voltar</button>
+                <button onclick="createNewOrder()" class="flex-1 py-3 bg-orange-500 text-white rounded-xl font-bold">ABRIR</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-checkout" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+        <div class="bg-slate-900 w-full max-w-sm rounded-2xl border border-slate-800 p-6 shadow-2xl text-center">
+            <h3 class="text-xl font-bold mb-1">Finalizar</h3>
+            <p id="checkout-total" class="text-4xl font-black text-white mb-6">R$ 0,00</p>
+            <div class="grid gap-2 mb-6">
+                <button onclick="finishOrder('PIX')" class="py-4 bg-slate-800 border border-slate-700 rounded-xl font-bold text-cyan-400 active:bg-cyan-900/20">PIX</button>
+                <button onclick="finishOrder('Cartão')" class="py-4 bg-slate-800 border border-slate-700 rounded-xl font-bold text-purple-400 active:bg-purple-900/20">CARTÃO</button>
+                <button onclick="finishOrder('Dinheiro')" class="py-4 bg-slate-800 border border-slate-700 rounded-xl font-bold text-emerald-400 active:bg-emerald-900/20">DINHEIRO</button>
+            </div>
+            <button onclick="closeModals()" class="text-slate-500 font-bold">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMAÇÃO DE FECHAMENTO -->
+    <div id="modal-confirm-close" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+        <div class="bg-slate-900 w-full max-w-sm rounded-2xl border border-slate-800 p-6 shadow-2xl text-center">
+            <h3 class="text-xl font-bold mb-2">Fechar Relatório?</h3>
+            <p class="text-slate-400 text-sm mb-6">Ao confirmar, o resumo do dia será gerado e os dados atuais serão zerados.</p>
+            <div class="grid gap-3">
+                <button onclick="exportAndReset()" class="py-4 bg-green-600 text-white rounded-xl font-bold active:scale-95 transition-transform">SIM</button>
+                <button onclick="closeModals()" class="py-4 bg-slate-800 text-slate-300 border border-slate-700 rounded-xl font-bold active:bg-slate-700">Voltar para operação</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="hidden fixed top-4 left-1/2 -translate-x-1/2 bg-orange-500 text-white px-6 py-3 rounded-full font-bold shadow-2xl z-[100] animate-bounce text-sm">
+        Relatório Copiado!
+    </div>
+
+    <script>
+        const MENU = [
+            { id: 1, name: "Carne", price: 9, category: "Espetos" },
+            { id: 2, name: "Carne c/ Bacon", price: 10, category: "Espetos" },
+            { id: 3, name: "Kafta", price: 8, category: "Espetos" },
+            { id: 4, name: "Kafta c/ Queijo", price: 10, category: "Espetos" },
+            { id: 5, name: "Frango c/ Bacon", price: 9, category: "Espetos" },
+            { id: 6, name: "Coração", price: 10, category: "Espetos" },
+            { id: 7, name: "Linguiça", price: 8, category: "Espetos" },
+            { id: 8, name: "Linguiça Apimentada", price: 8, category: "Espetos" },
+            { id: 9, name: "Queijo Coalho", price: 9, category: "Espetos" },
+            { id: 10, name: "Pão de Alho", price: 6, category: "Espetos" },
+            { id: 50, name: "Opcional: No Lanche", price: 6, category: "Adicionais" },
+            { id: 100, name: "Refri Lata", price: 6, category: "Bebidas" },
+            { id: 101, name: "Suco Del Valle", price: 8, category: "Bebidas" },
+            { id: 102, name: "Heineken/Original", price: 6, category: "Bebidas" },
+            { id: 103, name: "Amstel", price: 5, category: "Bebidas" },
+            { id: 104, name: "Skol", price: 4, category: "Bebidas" },
+            { id: 105, name: "Gin (700ml)", price: 15, category: "Bebidas" },
+            { id: 106, name: "Whisky (700ml)", price: 20, category: "Bebidas" },
+            { id: 107, name: "Mansão Maromba", price: 25, category: "Bebidas" },
+            { id: 108, name: "Heineken - Long Neck", price: 10, category: "Bebidas" }
+        ];
+
+        let state = { activeOrders: [], salesHistory: [], currentView: 'orders', selectedOrderId: null };
+
+        function init() {
+            const saved = localStorage.getItem('espetinho_pdv_state');
+            if (saved) state = JSON.parse(saved);
+            renderOrders();
+            renderReport();
+        }
+
+        function save() { localStorage.setItem('espetinho_pdv_state', JSON.stringify(state)); }
+
+        function switchView(view) {
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`view-${view}`).classList.remove('hidden');
+            document.getElementById('bottom-bar').classList.toggle('hidden', view !== 'menu');
+            document.getElementById('tab-orders').classList.toggle('active-tab', view === 'orders');
+            document.getElementById('tab-report').classList.toggle('active-tab', view === 'report');
+            if(view === 'orders') renderOrders();
+            if(view === 'report') renderReport();
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModals() { document.querySelectorAll('[id^="modal-"]').forEach(m => m.classList.add('hidden')); }
+
+        function createNewOrder() {
+            const name = document.getElementById('input-customer-name').value.trim().toUpperCase();
+            if (!name) return;
+            const order = { id: Date.now(), customer: name, items: {} };
+            state.activeOrders.push(order);
+            save();
+            document.getElementById('input-customer-name').value = '';
+            closeModals();
+            openOrderDetails(order.id);
+        }
+
+        function openOrderDetails(id) {
+            state.selectedOrderId = id;
+            const order = state.activeOrders.find(o => o.id === id);
+            document.getElementById('menu-customer-name').innerText = order.customer;
+            renderMenu();
+            switchView('menu');
+        }
+
+        function renderOrders() {
+            const list = document.getElementById('orders-list');
+            if (!state.activeOrders.length) { 
+                list.innerHTML = '<div class="text-center py-20 text-slate-700 italic text-sm">Nenhuma comanda aberta.</div>'; 
+                return; 
+            }
+            list.innerHTML = state.activeOrders.map(o => `
+                <div onclick="openOrderDetails(${o.id})" class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex justify-between items-center active:bg-slate-800 cursor-pointer">
+                    <span class="font-bold text-slate-200">${o.customer}</span>
+                    <span class="text-orange-500 font-black">R$ ${calcTotal(o).toFixed(2)}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderMenu() {
+            const container = document.getElementById('menu-categories');
+            const order = state.activeOrders.find(o => o.id === state.selectedOrderId);
+            const cats = [...new Set(MENU.map(i => i.category))];
+            
+            container.innerHTML = cats.map(cat => `
+                <h3 class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-2">${cat}</h3>
+                <div class="grid gap-2 mb-4">
+                    ${MENU.filter(i => i.category === cat).map(item => `
+                        <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
+                            <div class="flex-1 cursor-pointer" onclick="updateQty(${item.id}, 1)">
+                                <p class="font-bold text-sm text-slate-200">${item.name}</p>
+                                <p class="text-orange-500 font-bold text-xs">R$ ${item.price.toFixed(2)}</p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                ${order.items[item.id] ? `
+                                    <button onclick="updateQty(${item.id}, -1)" class="w-10 h-10 bg-slate-800 rounded-lg text-slate-400 font-bold active:bg-slate-700">-</button>
+                                    <span class="font-black text-white w-4 text-center">${order.items[item.id]}</span>
+                                ` : ''}
+                                <button onclick="updateQty(${item.id}, 1)" class="w-12 h-12 bg-orange-600 rounded-lg font-black text-xl active:bg-orange-500">+</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
+            updateTotalBar();
+        }
+
+        function updateQty(itemId, change) {
+            const order = state.activeOrders.find(o => o.id === state.selectedOrderId);
+            order.items[itemId] = (order.items[itemId] || 0) + change;
+            if (order.items[itemId] <= 0) delete order.items[itemId];
+            save();
+            renderMenu();
+        }
+
+        function calcTotal(order) {
+            return Object.entries(order.items).reduce((acc, [id, qty]) => {
+                const item = MENU.find(i => i.id == id);
+                return acc + (item.price * qty);
+            }, 0);
+        }
+
+        function updateTotalBar() {
+            const order = state.activeOrders.find(o => o.id === state.selectedOrderId);
+            document.getElementById('order-total-display').innerText = `R$ ${calcTotal(order).toFixed(2)}`;
+            document.getElementById('checkout-total').innerText = `R$ ${calcTotal(order).toFixed(2)}`;
+        }
+
+        function finishOrder(method) {
+            const idx = state.activeOrders.findIndex(o => o.id === state.selectedOrderId);
+            const order = state.activeOrders[idx];
+            
+            state.salesHistory.push({
+                total: calcTotal(order),
+                method,
+                items: JSON.parse(JSON.stringify(order.items)),
+                date: new Date().toLocaleTimeString()
+            });
+
+            state.activeOrders.splice(idx, 1);
+            save();
+            closeModals();
+            switchView('orders');
+        }
+
+        function renderReport() {
+            const summary = state.salesHistory.reduce((acc, s) => {
+                acc[s.method] += s.total;
+                acc.total += s.total;
+                Object.entries(s.items).forEach(([id, qty]) => {
+                    acc.itemCounts[id] = (acc.itemCounts[id] || 0) + qty;
+                });
+                return acc;
+            }, { PIX: 0, Cartão: 0, Dinheiro: 0, total: 0, itemCounts: {} });
+
+            document.getElementById('rep-total').innerText = `R$ ${summary.total.toFixed(2)}`;
+            document.getElementById('rep-count').innerText = state.salesHistory.length;
+            document.getElementById('rep-pix').innerText = `R$ ${summary.PIX.toFixed(2)}`;
+            document.getElementById('rep-card').innerText = `R$ ${summary.Cartão.toFixed(2)}`;
+            document.getElementById('rep-cash').innerText = `R$ ${summary.Dinheiro.toFixed(2)}`;
+
+            const listContainer = document.getElementById('rep-items-list');
+            const sortedItems = Object.entries(summary.itemCounts).sort((a, b) => b[1] - a[1]);
+            
+            if (sortedItems.length === 0) {
+                listContainer.innerHTML = '<div class="p-4 text-slate-600 italic text-xs">Sem itens vendidos ainda.</div>';
+            } else {
+                listContainer.innerHTML = sortedItems.map(([id, qty]) => {
+                    const item = MENU.find(i => i.id == id);
+                    return `<div class="p-4 flex justify-between"><span>${item.name}</span><span class="font-black text-orange-400">${qty} un</span></div>`;
+                }).join('');
+            }
+        }
+
+        async function exportAndReset() {
+            closeModals(); // Fecha modal de confirmação
+            if (!state.salesHistory.length) return alert("Sem dados para exportar.");
+            
+            const summary = state.salesHistory.reduce((acc, s) => {
+                acc[s.method] += s.total;
+                acc.total += s.total;
+                Object.entries(s.items).forEach(([id, qty]) => {
+                    acc.itemCounts[id] = (acc.itemCounts[id] || 0) + qty;
+                });
+                return acc;
+            }, { PIX: 0, Cartão: 0, Dinheiro: 0, total: 0, itemCounts: {} });
+
+            const itemText = Object.entries(summary.itemCounts)
+                .sort((a, b) => b[1] - a[1])
+                .map(([id, qty]) => `• ${qty}x ${MENU.find(i => i.id == id).name}`)
+                .join('\n');
+
+            const texto = `🔥 *FECHAMENTO ESPETINHO VIP*\n📅 ${new Date().toLocaleDateString()}\n\n💰 *Total: R$ ${summary.total.toFixed(2)}*\n------------------\n💎 PIX: R$ ${summary.PIX.toFixed(2)}\n💳 Cartão: R$ ${summary.Cartão.toFixed(2)}\n💵 Dinheiro: R$ ${summary.Dinheiro.toFixed(2)}\n\n📊 *ITENS VENDIDOS:*\n${itemText}\n------------------\n✅ Total de Vendas: ${state.salesHistory.length}`;
+
+            try {
+                if (navigator.share) {
+                    await navigator.share({ text: texto });
+                    finalReset();
+                } else { throw "No Share API"; }
+            } catch (err) {
+                // Fallback WhatsApp Link
+                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`, '_blank');
+                
+                // Copy to clipboard
+                const el = document.createElement('textarea');
+                el.value = texto;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+
+                showToast();
+                setTimeout(() => {
+                    finalReset();
+                }, 1500);
+            }
+        }
+
+        function finalReset() {
+            state.salesHistory = [];
+            save();
+            renderReport();
+            switchView('orders');
+        }
+
+        function showToast() {
+            const t = document.getElementById('toast');
+            t.classList.remove('hidden');
+            setTimeout(() => t.classList.add('hidden'), 3000);
+        }
+
+        window.onload = init;
+    </script>
+
+    <!-- SERVICE WORKER REGISTRATION -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registrado com sucesso!', reg.scope))
+                    .catch(err => console.error('Erro ao registrar Service Worker:', err));
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-orange: oklch(0.7 0.25 45);
+  --color-brand-slate: oklch(0.1 0.05 250);
+}
+
+@layer base {
+  :root {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 24.3 95% 53.1%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 24.3 95% 53.1%;
+    --radius: 1rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-slate-800;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-[#020617] text-slate-50 antialiased selection:bg-orange-500/30;
+    font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+    user-select: none;
+  }
+}
+
+.glass {
+  @apply bg-slate-900/40 backdrop-blur-md border border-slate-800/50;
+}
+
+.active-tab {
+  @apply border-b-2 border-orange-500 text-orange-500;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate-950;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-800 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-700;
+}
