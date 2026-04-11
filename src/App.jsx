@@ -197,7 +197,7 @@ export default function App() {
       <header className="px-5 py-4 flex justify-between items-center border-b border-white/5 bg-slate-950/80 backdrop-blur-xl sticky top-0 z-40">
         <div>
           <h1 className="text-xl font-bold tracking-tight">
-            POINT DO<span className="text-orange-500">HUGÃO</span>
+            POINT DO<span className="text-orange-500"> HUGÃO</span>
           </h1>
           <div className="flex items-center gap-1.5 mt-0.5">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
