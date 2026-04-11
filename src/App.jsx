@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { 
-  Plus, 
-  ChevronLeft, 
-  CreditCard, 
-  Wallet, 
-  Trash2, 
-  Share2, 
-  CheckCircle2, 
-  Package, 
+import {
+  Plus,
+  ChevronLeft,
+  CreditCard,
+  Wallet,
+  Trash2,
+  Share2,
+  CheckCircle2,
+  Package,
   TrendingUp,
   Receipt,
   ShoppingCart,
@@ -50,7 +50,7 @@ export default function App() {
     const saved = localStorage.getItem('espetinho_active_orders');
     return saved ? JSON.parse(saved) : [];
   });
-  
+
   const [salesHistory, setSalesHistory] = useState(() => {
     const saved = localStorage.getItem('espetinho_sales_history');
     return saved ? JSON.parse(saved) : [];
@@ -159,13 +159,13 @@ export default function App() {
 
   const exportReport = async () => {
     if (!salesHistory.length) return alert("Sem dados para exportar.");
-    
+
     const itemText = Object.entries(reportSummary.itemCounts)
       .sort((a, b) => (b[1]) - (a[1]))
       .map(([id, qty]) => `• ${qty}x ${MENU.find(i => i.id == id).name}`)
       .join('\n');
 
-    const texto = `🔥 *FECHAMENTO ESPETINHO VIP*\n📅 ${new Date().toLocaleDateString()}\n\n💰 *Total: R$ ${reportSummary.total.toFixed(2)}*\n------------------\n💎 PIX: R$ ${reportSummary.PIX.toFixed(2)}\n💳 Cartão: R$ ${reportSummary.Cartão.toFixed(2)}\n💵 Dinheiro: R$ ${reportSummary.Dinheiro.toFixed(2)}\n\n📊 *ITENS VENDIDOS:*\n${itemText}\n------------------\n✅ Total de Vendas: ${salesHistory.length}`;
+    const texto = `🔥 *FECHAMENTO POINT DO HUGÃO*\n📅 ${new Date().toLocaleDateString()}\n\n💰 *Total: R$ ${reportSummary.total.toFixed(2)}*\n------------------\n💎 PIX: R$ ${reportSummary.PIX.toFixed(2)}\n💳 Cartão: R$ ${reportSummary.Cartão.toFixed(2)}\n💵 Dinheiro: R$ ${reportSummary.Dinheiro.toFixed(2)}\n\n📊 *ITENS VENDIDOS:*\n${itemText}\n------------------\n✅ Total de Vendas: ${salesHistory.length}`;
 
     try {
       if (navigator.share) {
@@ -197,14 +197,14 @@ export default function App() {
       <header className="px-5 py-4 flex justify-between items-center border-b border-white/5 bg-slate-950/80 backdrop-blur-xl sticky top-0 z-40">
         <div>
           <h1 className="text-xl font-bold tracking-tight">
-            ESPETINHO<span className="text-orange-500">VIP</span>
+            POINT DO<span className="text-orange-500">HUGÃO</span>
           </h1>
           <div className="flex items-center gap-1.5 mt-0.5">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Sistema Ativo</span>
           </div>
         </div>
-        <button 
+        <button
           onClick={() => setShowNewOrderModal(true)}
           className="p-2.5 bg-orange-500 rounded-2xl shadow-lg shadow-orange-500/20 active:scale-90 transition-transform"
         >
@@ -215,7 +215,7 @@ export default function App() {
       {/* NAV TABS */}
       {activeView !== 'menu' && (
         <nav className="flex px-5 border-b border-white/5 bg-slate-950">
-          <button 
+          <button
             onClick={() => setActiveView('orders')}
             className={cn(
               "flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all",
@@ -224,7 +224,7 @@ export default function App() {
           >
             Comandas
           </button>
-          <button 
+          <button
             onClick={() => setActiveView('report')}
             className={cn(
               "flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all",
@@ -240,7 +240,7 @@ export default function App() {
       <main className="flex-1 overflow-y-auto p-5 pb-32">
         <AnimatePresence mode="wait">
           {activeView === 'orders' && (
-            <motion.div 
+            <motion.div
               key="orders"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -257,7 +257,7 @@ export default function App() {
               ) : (
                 <div className="grid gap-3">
                   {activeOrders.map(order => (
-                    <div 
+                    <div
                       key={order.id}
                       onClick={() => openOrderDetails(order.id)}
                       className="group p-5 rounded-3xl bg-slate-900/50 border border-white/5 flex justify-between items-center active:bg-slate-900 transition-colors"
@@ -286,7 +286,7 @@ export default function App() {
           )}
 
           {activeView === 'menu' && (
-            <motion.div 
+            <motion.div
               key="menu"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -294,7 +294,7 @@ export default function App() {
               className="space-y-6"
             >
               <div className="flex items-center gap-4 sticky top-0 bg-slate-950 py-2 z-10">
-                <button 
+                <button
                   onClick={() => setActiveView('orders')}
                   className="p-3 rounded-2xl bg-slate-900 border border-white/5 active:scale-90 transition-transform"
                 >
@@ -303,7 +303,7 @@ export default function App() {
                 <div className="flex-1 min-w-0">
                   <h2 className="text-xl font-bold truncate text-orange-500 uppercase">{currentOrder?.customer}</h2>
                 </div>
-                <button 
+                <button
                   onClick={() => deleteOrder(selectedOrderId)}
                   className="p-3 rounded-2xl text-red-500/50 hover:text-red-500 active:scale-90 transition-all"
                 >
@@ -324,14 +324,14 @@ export default function App() {
                         <div className="flex items-center gap-3">
                           {currentOrder?.items[item.id] > 0 && (
                             <div className="flex items-center gap-3 bg-slate-950 p-1 rounded-2xl">
-                              <button 
+                              <button
                                 onClick={() => updateQty(item.id, -1)}
                                 className="w-10 h-10 flex items-center justify-center text-slate-500 font-bold active:bg-white/5 rounded-xl"
                               >
                                 -
                               </button>
                               <span className="w-4 text-center font-bold text-sm">{currentOrder.items[item.id]}</span>
-                              <button 
+                              <button
                                 onClick={() => updateQty(item.id, 1)}
                                 className="w-10 h-10 flex items-center justify-center text-orange-500 font-bold active:bg-white/5 rounded-xl"
                               >
@@ -340,12 +340,12 @@ export default function App() {
                             </div>
                           )}
                           {!currentOrder?.items[item.id] && (
-                             <button 
-                               onClick={() => updateQty(item.id, 1)}
-                               className="w-12 h-12 bg-slate-900 border border-white/10 rounded-2xl flex items-center justify-center text-orange-500 active:scale-90 transition-transform shadow-lg"
-                             >
-                               <Plus size={20} />
-                             </button>
+                            <button
+                              onClick={() => updateQty(item.id, 1)}
+                              className="w-12 h-12 bg-slate-900 border border-white/10 rounded-2xl flex items-center justify-center text-orange-500 active:scale-90 transition-transform shadow-lg"
+                            >
+                              <Plus size={20} />
+                            </button>
                           )}
                         </div>
                       </div>
@@ -357,7 +357,7 @@ export default function App() {
           )}
 
           {activeView === 'report' && (
-            <motion.div 
+            <motion.div
               key="report"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -410,7 +410,7 @@ export default function App() {
                 </div>
               </div>
 
-              <button 
+              <button
                 onClick={() => setShowCloseConfirmModal(true)}
                 className="w-full py-5 bg-emerald-600 rounded-3xl font-bold text-white shadow-xl shadow-emerald-900/20 active:scale-95 transition-all flex items-center justify-center gap-2"
               >
@@ -425,7 +425,7 @@ export default function App() {
       {/* BOTTOM BAR (MENU VIEW) */}
       <AnimatePresence>
         {activeView === 'menu' && (
-          <motion.div 
+          <motion.div
             initial={{ y: 100 }}
             animate={{ y: 0 }}
             exit={{ y: 100 }}
@@ -436,7 +436,7 @@ export default function App() {
                 <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Subtotal</p>
                 <p className="text-3xl font-black text-white">R$ {currentTotal.toFixed(2)}</p>
               </div>
-              <button 
+              <button
                 onClick={() => setShowCheckoutModal(true)}
                 disabled={currentTotal === 0}
                 className="flex-1 py-4.5 bg-emerald-600 rounded-2xl font-bold text-white shadow-lg active:scale-95 disabled:opacity-50 disabled:active:scale-100 transition-all flex items-center justify-center gap-2"
@@ -453,7 +453,7 @@ export default function App() {
       <AnimatePresence>
         {showNewOrderModal && (
           <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
-            <motion.div 
+            <motion.div
               initial={{ y: 100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 100, opacity: 0 }}
@@ -466,17 +466,17 @@ export default function App() {
                 </button>
               </div>
               <div className="relative mb-8">
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   autoFocus
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value.toUpperCase())}
-                  placeholder="EX: JULIO" 
+                  placeholder="EX: JULIO"
                   className="w-full bg-slate-950 border border-white/5 rounded-3xl p-6 text-xl font-bold text-white focus:border-orange-500 outline-none transition-colors"
                 />
                 <Smartphone className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-800" size={24} />
               </div>
-              <button 
+              <button
                 onClick={createNewOrder}
                 className="w-full py-5 bg-orange-500 rounded-3xl font-bold text-lg active:scale-95 transition-transform"
               >
@@ -491,7 +491,7 @@ export default function App() {
       <AnimatePresence>
         {showCheckoutModal && (
           <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -501,9 +501,9 @@ export default function App() {
                 <p className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] mb-2">Total a Pagar</p>
                 <h3 className="text-4xl font-black text-white">R$ {currentTotal.toFixed(2)}</h3>
               </div>
-              
+
               <div className="grid gap-3 mb-8">
-                <button 
+                <button
                   onClick={() => finishOrder('PIX')}
                   className="group py-5 px-6 bg-slate-950 border border-white/5 rounded-[2rem] flex items-center justify-between hover:border-cyan-500/50 transition-all active:scale-95"
                 >
@@ -516,7 +516,7 @@ export default function App() {
                   <ChevronLeft className="rotate-180 text-slate-700 group-hover:text-cyan-400 transition-colors" size={16} />
                 </button>
 
-                <button 
+                <button
                   onClick={() => finishOrder('Cartão')}
                   className="group py-5 px-6 bg-slate-950 border border-white/5 rounded-[2rem] flex items-center justify-between hover:border-purple-500/50 transition-all active:scale-95"
                 >
@@ -529,7 +529,7 @@ export default function App() {
                   <ChevronLeft className="rotate-180 text-slate-700 group-hover:text-purple-400 transition-colors" size={16} />
                 </button>
 
-                <button 
+                <button
                   onClick={() => finishOrder('Dinheiro')}
                   className="group py-5 px-6 bg-slate-950 border border-white/5 rounded-[2rem] flex items-center justify-between hover:border-emerald-500/50 transition-all active:scale-95"
                 >
@@ -543,7 +543,7 @@ export default function App() {
                 </button>
               </div>
 
-              <button 
+              <button
                 onClick={() => setShowCheckoutModal(false)}
                 className="text-slate-500 font-bold text-sm tracking-widest uppercase"
               >
@@ -558,33 +558,33 @@ export default function App() {
       <AnimatePresence>
         {showCloseConfirmModal && (
           <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               className="w-full max-w-sm bg-slate-900 rounded-[2.5rem] border border-white/10 p-8 text-center"
             >
-                <div className="w-20 h-20 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-500 mx-auto mb-6">
-                  <Share2 size={32} />
-                </div>
-                <h3 className="text-xl font-bold mb-3">Fechar Relatório?</h3>
-                <p className="text-slate-400 text-sm leading-relaxed mb-8 px-4">
-                  O resumo do dia será gerado e todos os dados atuais serão zerados.
-                </p>
-                <div className="grid gap-3">
-                  <button 
-                    onClick={exportReport}
-                    className="py-5 bg-emerald-600 rounded-[2rem] font-bold text-lg active:scale-95 transition-transform shadow-lg shadow-emerald-900/20"
-                  >
-                    EXPORTAR E ZERAR
-                  </button>
-                  <button 
-                    onClick={() => setShowCloseConfirmModal(false)}
-                    className="py-5 bg-slate-950 border border-white/5 rounded-[2rem] font-bold text-slate-400 active:bg-white/5 transition-colors"
-                  >
-                    CONTINUAR OPERAÇÃO
-                  </button>
-                </div>
+              <div className="w-20 h-20 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-500 mx-auto mb-6">
+                <Share2 size={32} />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Fechar Relatório?</h3>
+              <p className="text-slate-400 text-sm leading-relaxed mb-8 px-4">
+                O resumo do dia será gerado e todos os dados atuais serão zerados.
+              </p>
+              <div className="grid gap-3">
+                <button
+                  onClick={exportReport}
+                  className="py-5 bg-emerald-600 rounded-[2rem] font-bold text-lg active:scale-95 transition-transform shadow-lg shadow-emerald-900/20"
+                >
+                  EXPORTAR E ZERAR
+                </button>
+                <button
+                  onClick={() => setShowCloseConfirmModal(false)}
+                  className="py-5 bg-slate-950 border border-white/5 rounded-[2rem] font-bold text-slate-400 active:bg-white/5 transition-colors"
+                >
+                  CONTINUAR OPERAÇÃO
+                </button>
+              </div>
             </motion.div>
           </div>
         )}
@@ -593,7 +593,7 @@ export default function App() {
       {/* TOAST */}
       <AnimatePresence>
         {toast && (
-          <motion.div 
+          <motion.div
             initial={{ y: -50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -50, opacity: 0 }}
