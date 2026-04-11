@@ -112,7 +112,7 @@ export default function App() {
     if (!order) return 0;
     return Object.entries(order.items).reduce((acc, [id, qty]) => {
       const item = MENU.find(i => i.id == id);
-      return acc + (item.price * (qty));
+      return acc + ((item?.price || 0) * (qty));
     }, 0);
   };
 
@@ -164,7 +164,10 @@ export default function App() {
 
     const itemText = Object.entries(reportSummary.itemCounts)
       .sort((a, b) => (b[1]) - (a[1]))
-      .map(([id, qty]) => `• ${qty}x ${MENU.find(i => i.id == id).name}`)
+      .map(([id, qty]) => {
+        const item = MENU.find(i => i.id == id);
+        return `• ${qty}x ${item?.name || 'Item Removido'}`;
+      })
       .join('\n');
 
     const texto = `🔥 *FECHAMENTO POINT DO HUGÃO*\n📅 ${new Date().toLocaleDateString()}\n\n💰 *Total: R$ ${reportSummary.total.toFixed(2)}*\n------------------\n💎 PIX: R$ ${reportSummary.PIX.toFixed(2)}\n💳 Cartão: R$ ${reportSummary.Cartão.toFixed(2)}\n💵 Dinheiro: R$ ${reportSummary.Dinheiro.toFixed(2)}\n\n📊 *ITENS VENDIDOS:*\n${itemText}\n------------------\n💡 Lucro não calculado. Envie seus custos para a Ottomatic para ativar esta função.\n------------------\n✅ Total de Vendas: ${salesHistory.length}`;
@@ -403,7 +406,7 @@ export default function App() {
                         const item = MENU.find(i => i.id == id);
                         return (
                           <div key={id} className="p-4 flex justify-between items-center">
-                            <span className="text-sm font-medium">{item.name}</span>
+                            <span className="text-sm font-medium">{item?.name || 'Item Removido'}</span>
                             <span className="px-3 py-1 rounded-full bg-slate-950 text-xs font-bold text-orange-500 border border-white/5">{qty} un</span>
                           </div>
                         );
