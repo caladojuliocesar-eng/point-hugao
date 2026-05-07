@@ -432,6 +432,37 @@ export default function AppFirebase() {
     }
   };
 
+  const clearOldTestSales = async () => {
+    if (!user || isProcessing) return;
+    const todayDateStr = new Date().toLocaleDateString();
+    const oldSales = salesHistory.filter(sale => {
+       const saleDateStr = new Date(sale.date).toLocaleDateString();
+       return saleDateStr !== todayDateStr;
+    });
+
+    if (oldSales.length === 0) {
+      alert("Nenhuma venda antiga em aberto encontrada.");
+      return;
+    }
+
+    if (!window.confirm(`Tem certeza que deseja APAGAR DEFINITIVAMENTE ${oldSales.length} vendas de dias anteriores? Esta ação não pode ser desfeita.`)) return;
+
+    setIsProcessing(true);
+    try {
+      const batch = writeBatch(db);
+      oldSales.forEach(sale => {
+        batch.delete(doc(db, `users/${user.uid}/sales`, sale.id));
+      });
+      await batch.commit();
+      showToast('Base limpa com sucesso!');
+    } catch (err) {
+      console.error(err);
+      showToast('Erro ao limpar base.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const calcOrderTotal = (order) => {
     if (!order || !order.items) return 0;
     return Object.entries(order.items).reduce((acc, [id, qty]) => {
@@ -840,6 +871,7 @@ export default function AppFirebase() {
                       <button onClick={() => setShowFixedCostsModal(true)} className="py-4 bg-slate-900 border border-white/10 rounded-2xl font-bold text-xs flex flex-col items-center gap-2"><Wallet size={18} className="text-cyan-500" />DESPESAS FIXAS</button>
                     </div>
                     <button onClick={downloadCSV} className="w-full py-4 bg-emerald-600 rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/20 active:scale-95 transition-transform mb-3"><Receipt size={18} />BAIXAR RELATÓRIO (EXCEL)</button>
+                    <button onClick={clearOldTestSales} className="w-full py-4 bg-red-900/50 border border-red-500/30 text-red-100 rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-transform mb-3"><Trash2 size={18} />APAGAR TESTES ANTIGOS</button>
                     <button onClick={() => setShowMonthClosingModal(true)} className="w-full py-4 bg-orange-600 rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-orange-900/20 active:scale-95 transition-transform mb-6"><CheckCircle2 size={18} />ENCERRAR PERÍODO / MÊS</button>
                     
                     <button onClick={() => setShowOnboarding(true)} className="w-full py-3 bg-slate-900 border border-white/5 rounded-xl text-slate-500 font-bold text-[10px] uppercase tracking-widest hover:text-slate-300 transition-colors">Ver Manual e Regras do Sistema</button>
